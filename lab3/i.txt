@@ -1,0 +1,26 @@
+1
+20
+2
+XAN 9
+FIVE 5
+FIVEz 5
+RAD 8
+Raasputiin 10
+MARIONE 9
+FAULT_Zero 11
+THREE 3
+Rick 9
+Scary 9
+XAN1 9
+FIVE1 5
+FIVEz1 5
+RAD1 8
+Raasputiin1 10
+MARIONE1 9
+FAULT1 11
+THREE1 3
+Rick1 9
+Scary1 9
+3
+4
+5
