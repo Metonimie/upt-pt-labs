@@ -46,7 +46,18 @@ void delete_entry(FILE * file, unsigned entry_no) {
 }
 
 void modify_entry(Database * entry) {
-
+  printf("Enter new repair type:\n");
+  printf("Current: %s\n> ", entry->repair_type);
+  scanf("%50[a-zA-Z ]", entry->repair_type);
+  printf("Enter new price:\n");
+  printf("Current: %d\n> ", entry->price);
+  scanf("%d", &entry->price);
+  printf("Enter new investment:\n");
+  printf("Current: %d\n> ", entry->investment);
+  scanf("%d", &entry->investment);
+  printf("Enter new profit:\n");
+  printf("Current: %d\n> ", entry->profit);
+  scanf("%d", &entry->profit);
 }
 
 void update_entry(FILE * file, unsigned entry_no) {
@@ -55,9 +66,10 @@ void update_entry(FILE * file, unsigned entry_no) {
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( i == entry_no ) {
       printf("Entry found!\n");
-      seek(file, -sizeof(Database), SEEK_CUR);
+      fseek(file, -sizeof(Database), SEEK_CUR);
       modify_entry(&entry);
       fwrite(&entry, sizeof(Database), 1, file);
+      printf("RETSwrote %s\n", entry.repair_type);
     }
   }
 }
@@ -130,9 +142,9 @@ int main(void) {
   // insert_entry(fp, &nokia);
   // }
   Database e;
-  read_entry(fp, &e);
+  // read_entry(fp, &e);
   display_database_entries(fp);
-  modify_entry(&e);
+  update_entry(fp, 2);
   display_database_entries(fp);
   // delete_entry(fp, 1);
   // display_database_entries(fp);
