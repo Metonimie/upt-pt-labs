@@ -14,11 +14,15 @@ typedef struct Db_tag {
   int profit;
 } Database;
 
+// function signatures
 void display_entry(Database * entry, unsigned index);
 void insert_entry(FILE * file, Database * entry);
 void read_entry(FILE * file, Database * entry);
 void validate_input(int i);
 
+// Deletes entry by making a temporary file and copying everything in it.
+// Except for the deleted entry, after that it deletes the original file
+// and renames the temporary one to match the original file's name.
 void delete_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
 
@@ -47,6 +51,9 @@ void delete_entry(FILE * file, unsigned entry_no) {
   }
 }
 
+// Reads new entry from stdin.
+// if exists is 1, it prints the entry's values.
+// if the entry is blacklisted it quits;
 void modify_entry(Database * entry, int exists) {
   if (entry->blacklisted && exists) {
     printf("Entry is blacklisted!\n Access Denied\n");
@@ -58,7 +65,7 @@ void modify_entry(Database * entry, int exists) {
   validate_input(0); scanf("%50[a-zA-Z -_'\"!~?]", entry->repair_type);
   printf("Enter new IMEI:\n");
   if (exists) printf("Current: %s\n> ", entry->imei);
-  validate_input(0); scanf("%50[a-zA-Z ]", entry->imei);
+  validate_input(0); scanf("%10[a-zA-Z ]", entry->imei);
   printf("Enter new price:\n");
   if (exists) printf("Current: %d\n> ", entry->price);
   validate_input(0); scanf("%d", &entry->price);
@@ -83,6 +90,7 @@ void update_entry(FILE * file, unsigned entry_no) {
   }
 }
 
+// Blacklists or Unblaclists an entry.
 void blacklist_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
   Database entry;
@@ -129,7 +137,7 @@ void display_entry(Database * entry, unsigned index) {
     entry->price,
     entry->investment,
     entry->profit,
-    (entry->blacklisted ? 'B' : '_')
+    (entry->blacklisted ? 'B' : '_') // ternary operator, if blaclist is 1 it prints B
  );
 }
 
@@ -139,6 +147,7 @@ void display_header() {
     "Profit");
 }
 
+// shows all entries and calculates profit + influx
 void display_database_entries(FILE * file) {
   fseek(file, 0, SEEK_SET);
   Database entry;
@@ -168,6 +177,8 @@ void display_menu() {
   printf("\n");
 }
 
+// removes all characters from stdin until newline.
+// basically it clears all the trash from stdin.
 void validate_input(int i) {
   if (!i) {
     int c;
@@ -175,6 +186,7 @@ void validate_input(int i) {
   }
 }
 
+// takes user choices.
 void process_choice(FILE * file) {
   display_menu();
   Database e;
