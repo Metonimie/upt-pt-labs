@@ -1,12 +1,17 @@
 CC = gcc
-TARGET = my_string
+TARGET1 = 1
+TARGET2 = 2
 CFLAGS = -Wall -O3
-all: $(TARGET)
+all: $(TARGET1) $(TARGET2)
 
-$(TARGET):
-	$(CC) $(CFLAGS) -c str.c
-	ar rcs libstr.a str.o
-	$(CC) $(CFLAGS) main.c -o $(TARGET).x -L. -lstr
+1:
+	$(CC) $(CFLAGS) -c cipher.c
+	ar rcs libcipher.a cipher.o
+	$(CC) $(CFLAGS) $(TARGET1).c -o $(TARGET1) -L. -lcipher
+
+2:
+	$(CC) $(CFLAGS) $(TARGET2).c -o $(TARGET2)
 
 clean:
-	$(RM) $(TARGET).x
+	$(RM) $(TARGET1)
+	$(RM) $(TARGET2)
