@@ -2,7 +2,7 @@ CC = gcc
 TARGET1 = 1
 TARGET2 = 2
 CFLAGS = -Wall -O3
-all: $(TARGET1) $(TARGET2)
+all: clean $(TARGET1) $(TARGET2)
 
 1:
 	$(CC) $(CFLAGS) -c cipher.c

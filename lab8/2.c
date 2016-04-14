@@ -55,7 +55,7 @@ void modify_entry(Database * entry, int exists) {
 
   printf("Enter new repair type:\n");
   if (exists) printf("Current: %s\n> ", entry->repair_type);
-  validate_input(0); scanf("%50[a-zA-Z ]", entry->repair_type);
+  validate_input(0); scanf("%50[a-zA-Z -_'\"!~?]", entry->repair_type);
   printf("Enter new IMEI:\n");
   if (exists) printf("Current: %s\n> ", entry->imei);
   validate_input(0); scanf("%50[a-zA-Z ]", entry->imei);
