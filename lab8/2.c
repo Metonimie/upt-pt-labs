@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #define ROW_LEN 50
@@ -16,6 +17,7 @@ typedef struct Db_tag {
 void display_entry(Database * entry, unsigned index);
 void insert_entry(FILE * file, Database * entry);
 void read_entry(FILE * file, Database * entry);
+void validate_input(int i);
 
 void delete_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
@@ -45,19 +47,27 @@ void delete_entry(FILE * file, unsigned entry_no) {
   }
 }
 
-void modify_entry(Database * entry) {
+void modify_entry(Database * entry, int exists) {
+  if (entry->blacklisted && exists) {
+    printf("Entry is blacklisted!\n Access Denied\n");
+    return;
+  }
+
   printf("Enter new repair type:\n");
-  printf("Current: %s\n> ", entry->repair_type);
-  scanf("%50[a-zA-Z ]", entry->repair_type);
+  if (exists) printf("Current: %s\n> ", entry->repair_type);
+  validate_input(0); scanf("%50[a-zA-Z ]", entry->repair_type);
+  printf("Enter new IMEI:\n");
+  if (exists) printf("Current: %s\n> ", entry->imei);
+  validate_input(0); scanf("%50[a-zA-Z ]", entry->imei);
   printf("Enter new price:\n");
-  printf("Current: %d\n> ", entry->price);
-  scanf("%d", &entry->price);
+  if (exists) printf("Current: %d\n> ", entry->price);
+  validate_input(0); scanf("%d", &entry->price);
   printf("Enter new investment:\n");
-  printf("Current: %d\n> ", entry->investment);
-  scanf("%d", &entry->investment);
+  if (exists) printf("Current: %d\n> ", entry->investment);
+  validate_input(0); scanf("%d", &entry->investment);
   printf("Enter new profit:\n");
-  printf("Current: %d\n> ", entry->profit);
-  scanf("%d", &entry->profit);
+  if (exists) printf("Current: %d\n> ", entry->profit);
+  validate_input(0); scanf("%d", &entry->profit);
 }
 
 void update_entry(FILE * file, unsigned entry_no) {
@@ -67,9 +77,37 @@ void update_entry(FILE * file, unsigned entry_no) {
     if ( i == entry_no ) {
       printf("Entry found!\n");
       fseek(file, -sizeof(Database), SEEK_CUR);
-      modify_entry(&entry);
+      modify_entry(&entry, 1);
       fwrite(&entry, sizeof(Database), 1, file);
-      printf("RETSwrote %s\n", entry.repair_type);
+    }
+  }
+}
+
+void blacklist_entry(FILE * file, unsigned entry_no) {
+  fseek(file, 0, SEEK_SET);
+  Database entry;
+  for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
+    if ( i == entry_no ) {
+      printf("Entry found!\n");
+      fseek(file, -sizeof(Database), SEEK_CUR);
+      if (entry.blacklisted) {
+        printf("Entry has been Unblacklisted!\n");
+        entry.blacklisted = 0;
+      } else {
+        printf("Entry has been Blacklisted!\n");
+        entry.blacklisted = 1;
+      }
+      fwrite(&entry, sizeof(Database), 1, file);
+    }
+  }
+}
+
+void search_entry(FILE * file, char * imei) {
+  fseek(file, 0, SEEK_SET);
+  Database entry;
+  for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
+    if ( !strcmp(entry.imei, imei) ) {
+      display_entry(&entry, 0);
     }
   }
 }
@@ -84,13 +122,14 @@ void read_entry(FILE * file, Database * entry) {
 }
 
 void display_entry(Database * entry, unsigned index) {
-  printf("|%3d|%50s|%10s|%6d| %10d| %10d|\n",
+  printf("|%3d|%50s|%10s|%6d| %10d| %10d| %c\n",
     index,
     entry->repair_type,
     entry->imei,
     entry->price,
     entry->investment,
-    entry->profit
+    entry->profit,
+    (entry->blacklisted ? 'B' : '_')
  );
 }
 
@@ -125,34 +164,72 @@ void display_menu() {
   printf("3. Update an entry.\n");
   printf("4. Delete an entry.\n");
   printf("5. Search by IMEI\n");
+  printf("6. Blacklist/UnBlacklist\n");
   printf("\n");
 }
 
-int main(void) {
-  FILE * fp = fopen("data.bdb", "r+b");
-  // for (int i = 0; i < 10; i++) {
-  // Database nokia = {
-  //   .blacklisted = 6,
-  //   .repair_type = "BATERIE3",
-  //   .imei = "nuavema",
-  //   .price = i,
-  //   .investment = 2,
-  //   .profit = 3,
-  // };
-  // insert_entry(fp, &nokia);
-  // }
+void validate_input(int i) {
+  if (!i) {
+    int c;
+    while( (c = getchar()) != '\n' );
+  }
+}
+
+void process_choice(FILE * file) {
+  display_menu();
   Database e;
-  // read_entry(fp, &e);
-  display_database_entries(fp);
-  update_entry(fp, 2);
-  display_database_entries(fp);
-  // delete_entry(fp, 1);
-  // display_database_entries(fp);
-  // printf("after ins %ld\n", ftell(fp));
-  // fseek(fp, -sizeof(Database), SEEK_CUR);
-  // printf("before read %ld\n", ftell(fp));
-  // read_entry(fp, &e);
-  // printf("after read %ld\n", ftell(fp));
-  // printf("%s\n", e.repair_type);
+
+  enum choices { exit_program_c, display_the_database_c, add_entry_c, update_entry_c,
+  delete_entry_c, search_by_imei_c, blacklist_c };
+
+  int choice = -1;
+  int entry_no = 0;
+  char buffer[50];
+  printf("Enter your choice\n>> ");
+  validate_input(scanf("%d", &choice));
+  switch (choice) {
+    case exit_program_c:
+      printf("Exiting...\n");
+      exit(0);
+      break;
+    case display_the_database_c:
+      display_database_entries(file);
+      break;
+    case add_entry_c:
+      modify_entry(&e, 0);
+      insert_entry(file, &e);
+      break;
+    case update_entry_c:
+      printf("Enter the entry number: ");
+      validate_input(scanf("%d", &entry_no));
+      update_entry(file, entry_no);
+      break;
+    case delete_entry_c:
+      validate_input(printf("Enter the entry number: "));
+      scanf("%d", &entry_no);
+      delete_entry(file, entry_no);
+      break;
+    case search_by_imei_c:
+      printf("Enter the IMEI: ");
+      scanf("%s", buffer);
+      search_entry(file, buffer);
+      break;
+    case blacklist_c:
+      validate_input(printf("Enter the entry number: "));
+      scanf("%d", &entry_no);
+      blacklist_entry(file, entry_no);
+      break;
+    default:
+      printf("Invalid choice!\n");
+  }
+  process_choice(file); // redo the choice, since the user hasn't exited;
+}
+
+int main(void) {
+  FILE * fp;
+  if ( !(fp = fopen("data.bdb", "r+b")) ) {
+    perror("Error opening file");
+  }
+  process_choice(fp);
   return 0;
 }
