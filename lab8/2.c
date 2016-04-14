@@ -17,18 +17,6 @@ void display_entry(Database * entry, unsigned index);
 void insert_entry(FILE * file, Database * entry);
 void read_entry(FILE * file, Database * entry);
 
-int isEmpty(FILE *file){
-    long savedOffset = ftell(file);
-    fseek(file, 0, SEEK_END);
-
-    if (ftell(file) == 0){
-        return 1;
-    }
-
-    fseek(file, savedOffset, SEEK_SET);
-    return 0;
-}
-
 void delete_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
 
@@ -57,6 +45,22 @@ void delete_entry(FILE * file, unsigned entry_no) {
   }
 }
 
+void modify_entry(Database * entry) {
+
+}
+
+void update_entry(FILE * file, unsigned entry_no) {
+  fseek(file, 0, SEEK_SET);
+  Database entry;
+  for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
+    if ( i == entry_no ) {
+      printf("Entry found!\n");
+      seek(file, -sizeof(Database), SEEK_CUR);
+      modify_entry(&entry);
+      fwrite(&entry, sizeof(Database), 1, file);
+    }
+  }
+}
 
 void insert_entry(FILE * file, Database * entry) {
   fseek(file, 0, SEEK_END);
@@ -126,10 +130,12 @@ int main(void) {
   // insert_entry(fp, &nokia);
   // }
   Database e;
-
+  read_entry(fp, &e);
+  display_database_entries(fp);
+  modify_entry(&e);
   display_database_entries(fp);
   // delete_entry(fp, 1);
-  display_database_entries(fp);
+  // display_database_entries(fp);
   // printf("after ins %ld\n", ftell(fp));
   // fseek(fp, -sizeof(Database), SEEK_CUR);
   // printf("before read %ld\n", ftell(fp));
