@@ -12,8 +12,8 @@ u8 * read_from_file(FILE * stream, long * read_o) {
   u8 * buffer = malloc( size );
   for (int i = 0; fread(buffer + i, u8_size, 1, stream); i++ ) {
     read += u8_size;
-    if ( read > size - 100) {
-      size += 1000;
+    if ( read > size - 100) { // realloc buffer in case it overflows
+      size *= 2; // double the size
       u8 * tmp = realloc(buffer, size);
       if (!tmp) {
         perror("Error, not enough memory!");
@@ -24,10 +24,10 @@ u8 * read_from_file(FILE * stream, long * read_o) {
   };
   left_over = read % 8;
   for (int j = 1; j <= left_over; j++) { // make 8 bytes
-    buffer[read + j] = (char) 32;
+    buffer[read + j] = (char) 32; // by adding spaces.
   }
   *read_o = read + left_over;
-  return buffer;
+  return buffer; // buffer needs to be divisible by 8 for this to work.
 }
 
 void encrypt_file(char * filename, u8 * password) {
