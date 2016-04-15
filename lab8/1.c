@@ -39,7 +39,7 @@ void encrypt_file(char * filename, u8 * password) {
   }
   long read = 0;
   u8 * buffer = read_from_file(in, &read);
-  for (int i = 0; i <= read/8; i++) {
+  for (int i = 0; i < read/8; i++) {
     encrypt(buffer+i*8, password);
   }
 
@@ -60,7 +60,7 @@ void decrypt_file(char * filename, u8 * password) {
   long read = 0;
 
   u8 * buffer = read_from_file(in, &read);
-  for (int i = 0; i <= read/8; i++) {
+  for (int i = 0; i < read/8; i++) {
     decrypt(buffer+i*8, password);
   }
 
@@ -85,8 +85,8 @@ int main (int argc, char *argv[]) {
     return 0;
   }
   u8 inputKey[strlen(password) - 1];
-  int i = 0;
-  for (; password[i]; i++) {
+
+  for (int i = 0; password[i]; i++) {
     inputKey[i] = password[i];
   }
 
