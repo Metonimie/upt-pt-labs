@@ -36,15 +36,18 @@ void delete_entry(FILE * file, unsigned entry_no) {
       insert_entry(out, &entry);
     }
   }
-  insert_entry(out, &entry);
+
   if ( !found ) {
     printf("Entry not found!\n");
+    system("rm -f .temp");
+    return;
   }
 
   system("rm -f data.bdb; mv .temp data.bdb"); // copy and remove, ty unix <3
   if ( fclose(file) ) {
     perror("Can't close file!");
   }
+
   if ( !(file = fopen("data.bdb", "r+b")) ) {
     perror("Can't open file");
   }
@@ -116,7 +119,7 @@ void search_entry(FILE * file, long imei) {
   Database entry;
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( entry.imei == imei ) {
-      display_entry(&entry, 0);
+      display_entry(&entry, i);
       return;
     }
   }
