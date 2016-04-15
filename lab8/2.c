@@ -18,6 +18,8 @@ void display_entry(Database * entry, unsigned index);
 void insert_entry(FILE * file, Database * entry);
 void read_entry(FILE * file, Database * entry);
 void validate_input(int i);
+void display_header();
+void display_menu();
 
 // Deletes entry by making a temporary file and copying everything in it.
 // Except for the deleted entry, after that it deletes the original file
@@ -43,10 +45,11 @@ void delete_entry(FILE * file, unsigned entry_no) {
     return;
   }
 
-  system("rm -f data.bdb; mv .temp data.bdb"); // copy and remove, ty unix <3
   if ( fclose(file) || fclose(out) ) {
     perror("Can't close file!");
   }
+
+  system("rm -f data.bdb; mv .temp data.bdb"); // copy and remove, ty unix <3
 
   if ( !(file = fopen("data.bdb", "r+b")) ) {
     perror("Can't open file");
@@ -117,13 +120,17 @@ void blacklist_entry(FILE * file, unsigned entry_no) {
 void search_entry(FILE * file, long imei) {
   fseek(file, 0, SEEK_SET);
   Database entry;
+  short found = 0;
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( entry.imei == imei ) {
+      if (!found) display_header();
       display_entry(&entry, i);
-      return;
+      found = 1;
     }
   }
-  printf("Entry not found!\n");
+  if ( !found ) {
+    printf("Entry not found!\n");
+  }
 }
 
 void insert_entry(FILE * file, Database * entry) {
