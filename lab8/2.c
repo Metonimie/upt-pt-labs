@@ -44,7 +44,7 @@ void delete_entry(FILE * file, unsigned entry_no) {
   }
 
   system("rm -f data.bdb; mv .temp data.bdb"); // copy and remove, ty unix <3
-  if ( fclose(file) ) {
+  if ( fclose(file) || fclose(out) ) {
     perror("Can't close file!");
   }
 
