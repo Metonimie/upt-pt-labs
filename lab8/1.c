@@ -4,14 +4,16 @@
 #include "constants.h"
 #include "cipher.h"
 
-u8 * read_from_file(FILE * stream, int * read_o) {
+u8 * read_from_file(FILE * stream, long * read_o) {
   long u8_size = sizeof(u8);
   long size = u8_size * 1000;
   long read = 0;
+  long left_over = 0;
   u8 * buffer = malloc( size );
-  for (int i = 0; fread(buffer + i * u8_size, u8_size, 1, stream); i++ ) {
+  for (int i = 0; fread(buffer + i, u8_size, 1, stream); i++ ) {
     read += u8_size;
-    if ( read > 1) {
+    if ( read > size - 100) {
+      size += 1000;
       u8 * tmp = realloc(buffer, size);
       if (!tmp) {
         perror("Error, not enough memory!");
@@ -20,7 +22,11 @@ u8 * read_from_file(FILE * stream, int * read_o) {
       buffer = tmp;
     }
   };
-  *read_o = read;
+  left_over = read % 8;
+  for (int j = 1; j <= left_over; j++) { // make 8 bytes
+    buffer[read + j] = (char) 32;
+  }
+  *read_o = read + left_over;
   return buffer;
 }
 
@@ -31,11 +37,17 @@ void encrypt_file(char * filename, u8 * password) {
     perror("Error opening file.");
     return;
   }
-  int read = 0;
+  long read = 0;
   u8 * buffer = read_from_file(in, &read);
-  encrypt(buffer, password);
+  for (int i = 0; i <= read/8; i++) {
+    encrypt(buffer+i*8, password);
+  }
+
   fwrite(buffer, sizeof(u8), read, out);
-  printf("%s\n", buffer);
+  // printf("%s\n", buffer);
+  if ( fclose(in) || fclose(out) ) {
+    perror("Error closing files!");
+  }
 }
 
 void decrypt_file(char * filename, u8 * password) {
@@ -45,12 +57,18 @@ void decrypt_file(char * filename, u8 * password) {
     perror("Error opening file.");
     return;
   }
-  int read = 0;
-  u8 * buffer = read_from_file(in, &read);
-  decrypt(buffer, password);
-  fwrite(buffer, sizeof(u8), read, out);
-  printf("%s\n", buffer);
+  long read = 0;
 
+  u8 * buffer = read_from_file(in, &read);
+  for (int i = 0; i <= read/8; i++) {
+    decrypt(buffer+i*8, password);
+  }
+
+  fwrite(buffer, sizeof(u8), read, out);
+  // printf("%s\n", buffer);
+  if ( fclose(in) || fclose(out) ) {
+    perror("Error closing files!");
+  }
 }
 
 int main (int argc, char *argv[]) {
@@ -67,7 +85,7 @@ int main (int argc, char *argv[]) {
   for (; password[i]; i++) {
     inputKey[i] = password[i];
   }
-  
+
   u8 keys[SPECK_BLOCK_SIZE/16*SPECK_ROUNDS];
   encryptKeySchedule(inputKey, keys);
 
@@ -76,6 +94,21 @@ int main (int argc, char *argv[]) {
   } else {
     decrypt_file(argv[1], keys);
   }
+//   u8 inputKey[] = {"test"};
+// u8 keys[SPECK_BLOCK_SIZE/16*SPECK_ROUNDS];
+// // plain text: 74614620 736e6165
+// u8 plainText[] = "ana are mere, foarte multe mere, atat de multe incat nu mai poate";
+//
+// encryptKeySchedule(inputKey, keys);
+//
+// printf("PlainText: %s\n", plainText);
+//
+// encrypt(plainText+8, keys);
+// // cipher text: 9f7952ec 4175946c
+// printf("After encryption: %s\n", plainText);
+//
+// decrypt(plainText+8, keys);
+// printf("After decryption: %s\n", plainText);
 
   return 0;
 }
