@@ -44,7 +44,7 @@ void encrypt_file(char * filename, u8 * password) {
   }
 
   fwrite(buffer, sizeof(u8), read, out);
-  // printf("%s\n", buffer);
+  printf("%s\n", buffer);
   if ( fclose(in) || fclose(out) ) {
     perror("Error closing files!");
   }
@@ -65,7 +65,7 @@ void decrypt_file(char * filename, u8 * password) {
   }
 
   fwrite(buffer, sizeof(u8), read, out);
-  // printf("%s\n", buffer);
+  printf("%s\n", buffer);
   if ( fclose(in) || fclose(out) ) {
     perror("Error closing files!");
   }
@@ -80,6 +80,10 @@ int main (int argc, char *argv[]) {
   }
 
   char * password = argv[2];
+  if (strlen(password) < 12) {
+    perror("Password must be at least 12 characters long!");
+    return 0;
+  }
   u8 inputKey[strlen(password) - 1];
   int i = 0;
   for (; password[i]; i++) {
@@ -94,21 +98,6 @@ int main (int argc, char *argv[]) {
   } else {
     decrypt_file(argv[1], keys);
   }
-//   u8 inputKey[] = {"test"};
-// u8 keys[SPECK_BLOCK_SIZE/16*SPECK_ROUNDS];
-// // plain text: 74614620 736e6165
-// u8 plainText[] = "ana are mere, foarte multe mere, atat de multe incat nu mai poate";
-//
-// encryptKeySchedule(inputKey, keys);
-//
-// printf("PlainText: %s\n", plainText);
-//
-// encrypt(plainText+8, keys);
-// // cipher text: 9f7952ec 4175946c
-// printf("After encryption: %s\n", plainText);
-//
-// decrypt(plainText+8, keys);
-// printf("After decryption: %s\n", plainText);
 
   return 0;
 }
