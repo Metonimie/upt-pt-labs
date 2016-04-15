@@ -123,7 +123,7 @@ void search_entry(FILE * file, long imei) {
   short found = 0;
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( entry.imei == imei ) {
-      if (!found) display_header();
+      if (!found) display_header(); // Display header only once.
       display_entry(&entry, i);
       found = 1;
     }
