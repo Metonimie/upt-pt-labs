@@ -3,12 +3,11 @@
 #include <stdlib.h>
 
 #define ROW_LEN 50
-#define IMEI_LEN 10
 
 typedef struct Db_tag {
-  int blacklisted; // 1 yes, 0 no
+  int blacklisted : 1; // 1 yes, 0 no
   char repair_type[ROW_LEN];
-  char imei[IMEI_LEN];
+  long imei;
   int price;
   int investment;
   int profit;
@@ -64,17 +63,17 @@ void modify_entry(Database * entry, int exists) {
   if (exists) printf("Current: %s\n> ", entry->repair_type);
   validate_input(0); scanf("%50[a-zA-Z -_'\"!~?]", entry->repair_type);
   printf("Enter new IMEI:\n");
-  if (exists) printf("Current: %s\n> ", entry->imei);
-  validate_input(0); scanf("%10[a-zA-Z ]", entry->imei);
+  if (exists) printf("Current: %ld\n> ", entry->imei);
+  validate_input(0); scanf("%10ld", &entry->imei);
   printf("Enter new price:\n");
-  if (exists) printf("Current: %d\n> ", entry->price);
-  validate_input(0); scanf("%d", &entry->price);
+  if (exists) printf("Current: %10d\n> ", entry->price);
+  validate_input(0); scanf("%10d", &entry->price);
   printf("Enter new investment:\n");
   if (exists) printf("Current: %d\n> ", entry->investment);
-  validate_input(0); scanf("%d", &entry->investment);
-  printf("Enter new profit:\n");
-  if (exists) printf("Current: %d\n> ", entry->profit);
-  validate_input(0); scanf("%d", &entry->profit);
+  validate_input(0); scanf("%10d", &entry->investment);
+  entry->profit = entry->price - entry->investment;
+  entry->blacklisted = 0; // in case there is an 1 that's not touched.
+  validate_input(0); // clear remaining trash, if any.
 }
 
 void update_entry(FILE * file, unsigned entry_no) {
@@ -86,11 +85,13 @@ void update_entry(FILE * file, unsigned entry_no) {
       fseek(file, -sizeof(Database), SEEK_CUR);
       modify_entry(&entry, 1);
       fwrite(&entry, sizeof(Database), 1, file);
+      return;
     }
   }
+  printf("Entry not found!\n");
 }
 
-// Blacklists or Unblaclists an entry.
+// Blacklists or Unblacklists an entry.
 void blacklist_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
   Database entry;
@@ -110,18 +111,21 @@ void blacklist_entry(FILE * file, unsigned entry_no) {
   }
 }
 
-void search_entry(FILE * file, char * imei) {
+void search_entry(FILE * file, long imei) {
   fseek(file, 0, SEEK_SET);
   Database entry;
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
-    if ( !strcmp(entry.imei, imei) ) {
+    if ( entry.imei == imei ) {
       display_entry(&entry, 0);
+      return;
     }
   }
+  printf("Entry not found!\n");
 }
 
 void insert_entry(FILE * file, Database * entry) {
   fseek(file, 0, SEEK_END);
+  entry->profit = entry->price - entry->investment;
   fwrite(entry, sizeof(Database), 1, file);
 }
 
@@ -130,7 +134,7 @@ void read_entry(FILE * file, Database * entry) {
 }
 
 void display_entry(Database * entry, unsigned index) {
-  printf("|%3d|%50s|%10s|%6d| %10d| %10d| %c\n",
+  printf("|%3d|%50s|%10ld|%10d| %10d| %10d| %c\n",
     index,
     entry->repair_type,
     entry->imei,
@@ -142,7 +146,7 @@ void display_entry(Database * entry, unsigned index) {
 }
 
 void display_header() {
-  printf("|%3s|%50s|%10s|%6s| %10s| %10s|\n",
+  printf("|%3s|%50s|%10s|%10s| %10s| %10s|\n",
     "i", "Repair Type", "IMEI", "Price", "Investment",
     "Profit");
 }
@@ -196,7 +200,6 @@ void process_choice(FILE * file) {
 
   int choice = -1;
   int entry_no = 0;
-  char buffer[50];
   printf("Enter your choice\n>> ");
   validate_input(scanf("%d", &choice));
   switch (choice) {
@@ -217,18 +220,18 @@ void process_choice(FILE * file) {
       update_entry(file, entry_no);
       break;
     case delete_entry_c:
-      validate_input(printf("Enter the entry number: "));
-      scanf("%d", &entry_no);
+      printf("Enter the entry number: ");
+      validate_input(scanf("%d", &entry_no));
       delete_entry(file, entry_no);
       break;
     case search_by_imei_c:
       printf("Enter the IMEI: ");
-      scanf("%s", buffer);
-      search_entry(file, buffer);
+      validate_input(scanf("%ld", &e.imei));
+      search_entry(file, e.imei);
       break;
     case blacklist_c:
-      validate_input(printf("Enter the entry number: "));
-      scanf("%d", &entry_no);
+      printf("Enter the entry number: ");
+      validate_input(scanf("%d", &entry_no));
       blacklist_entry(file, entry_no);
       break;
     default:
