@@ -45,6 +45,7 @@ void encrypt_file(char * filename, u8 * password) {
 
   fwrite(buffer, sizeof(u8), read, out);
   printf("%s\n", buffer);
+  free(buffer);
   if ( fclose(in) || fclose(out) ) {
     perror("Error closing files!");
   }
@@ -66,6 +67,7 @@ void decrypt_file(char * filename, u8 * password) {
 
   fwrite(buffer, sizeof(u8), read, out);
   printf("%s\n", buffer);
+  free(buffer);
   if ( fclose(in) || fclose(out) ) {
     perror("Error closing files!");
   }
