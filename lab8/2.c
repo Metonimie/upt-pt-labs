@@ -30,7 +30,7 @@ void delete_entry(FILE * file, unsigned entry_no) {
   Database entry;
   short found = 0;
   FILE * out;
-  if ( (out = fopen(".temp", "wb")) ) {
+  if ( !(out = fopen(".temp", "wb")) ) {
     perror("Error opening file!");
     exit(0);
   }
@@ -106,20 +106,24 @@ void update_entry(FILE * file, unsigned entry_no) {
 void blacklist_entry(FILE * file, unsigned entry_no) {
   fseek(file, 0, SEEK_SET);
   Database entry;
+  // long imei = 0;
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( i == entry_no ) {
       printf("Entry found!\n");
       fseek(file, -sizeof(Database), SEEK_CUR);
-      if (entry.blacklisted) {
-        printf("Entry has been Unblacklisted!\n");
-        entry.blacklisted = 0;
-      } else {
-        printf("Entry has been Blacklisted!\n");
-        entry.blacklisted = 1;
-      }
+      // imei = entry.imei;
+      entry.blacklisted ^= 1;
       fwrite(&entry, sizeof(Database), 1, file);
     }
   }
+  // fseek(file, 0, SEEK_SET);
+  // for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
+  //   if ( entry.imei == imei) {
+  //     fseek(file, -sizeof(Database), SEEK_CUR);
+  //     entry.blacklisted ^= 1;
+  //     fwrite(&entry, sizeof(Database), 1, file);
+  //   }
+  // }
 }
 
 void search_entry(FILE * file, long imei) {
