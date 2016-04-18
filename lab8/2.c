@@ -29,7 +29,11 @@ void delete_entry(FILE * file, unsigned entry_no) {
 
   Database entry;
   short found = 0;
-  FILE * out = fopen(".temp", "wb");
+  FILE * out;
+  if ( (out = fopen(".temp", "wb")) ) {
+    perror("Error opening file!");
+    exit(0);
+  }
   for( int i = 0; fread(&entry, sizeof(Database), 1, file); i++ ) {
     if ( i == entry_no ) {
       printf("Entry found and deleted!\n");
@@ -53,6 +57,7 @@ void delete_entry(FILE * file, unsigned entry_no) {
 
   if ( !(file = fopen("data.bdb", "r+b")) ) {
     perror("Can't open file");
+    exit(0);
   }
 }
 
@@ -254,6 +259,7 @@ int main(void) {
   FILE * fp;
   if ( !(fp = fopen("data.bdb", "r+b")) ) {
     perror("Error opening file");
+    return -1;
   }
   process_choice(fp);
   return 0;
