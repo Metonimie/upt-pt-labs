@@ -7,6 +7,11 @@
 // <polyline points="50,150 50,200 200,200 200,100" stroke="red" stroke-width="4" fill="none" />
 // <line x1="50" y1="50" x2="200" y2="200" stroke="blue" stroke-width="4" />
 
+/* This function draws the disks. It stops when it has drawn all the disks
+ * or before getting to a minimum y, which represents the height of the băț
+ * after that it picks a random color from an array of predefined colors and
+ * draws the disks before calling itself recusively.
+ */
 void draw_disks(FILE * file, int disks, int peg, int width, int y) {
   if ( !disks ) { return; } // no more disks to draw
   if ( y < 120) { return; } // keeps the peg from overflowing;
@@ -20,13 +25,21 @@ void draw_disks(FILE * file, int disks, int peg, int width, int y) {
   draw_disks(file, disks - 1, peg, width - width / 4, y - 21);
 }
 
+/*
+ * This functions draws the bețe by using recursion, it stops when pegs is 0
+ * and it places them at 100px distance between them. (i think)
+ */
 void draw_pegs(FILE * file, int pegs, int width) {
   if ( !pegs ) { return; } // exit function
   fprintf(file, "<rect x=\"%d\" y=\"120\" width=\"15\" height=\"130\" "\
                 "fill=\"firebrick\" />\r\n", width);
   draw_pegs(file, pegs - 1, width + 100);
 }
-
+/*
+ * This function draws the whole thing.
+ * First it sets up the secene, it calls the function that draws "bețe",
+ * and after it calls the function that draws the disks.
+ */
 void draw_peg_scene(FILE * file, int pegs, int disks) {
   int scene_width = pegs * 100;
   fprintf(file, "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\r\n"); // start
