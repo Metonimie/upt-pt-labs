@@ -45,7 +45,11 @@ int main(int argc, char *argv[]) {
     perror("Can't open file!");
     return -1;
   }
-  draw_peg_scene(file, 3, 10);
+  if ( argc < 3 ) {
+    printf("Invalid ussage. Correct usage: %s pegs disks\n", argv[0]);
+    return -1;
+  }
+  draw_peg_scene(file, atoi(argv[1]), atoi(argv[2]));
 
   if ( fclose(file) ) {
     perror("Can't close file!");
