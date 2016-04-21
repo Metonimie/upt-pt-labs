@@ -3,7 +3,8 @@
 <rect x="70" y="120" width="15" height="130" fill="firebrick" />
 <rect x="170" y="120" width="15" height="130" fill="firebrick" />
 <rect x="270" y="120" width="15" height="130" fill="firebrick" />
-<rect x="240" y="230" width="80" height="20" fill="#ef8a48" stroke="black" stroke-width="1" />
-<rect x="250" y="209" width="60" height="20" fill="#ba1d1e" stroke="black" stroke-width="1" />
-<rect x="258" y="188" width="45" height="20" fill="#ec8484" stroke="black" stroke-width="1" />
+<rect x="40" y="230" width="80" height="20" fill="#bbe200" stroke="black" stroke-width="1" />
+<rect x="50" y="209" width="60" height="20" fill="#ef8a48" stroke="black" stroke-width="1" />
+<rect x="58" y="188" width="45" height="20" fill="#149dca" stroke="black" stroke-width="1" />
+<rect x="63" y="167" width="34" height="20" fill="#ba1d1e" stroke="black" stroke-width="1" />
 </svg>

@@ -31,6 +31,7 @@ void draw_disks(FILE * file, int disks, int peg, int width, int y) {
  */
 void draw_pegs(FILE * file, int pegs, int width) {
   if ( !pegs ) { return; } // exit function
+  if ( pegs > 10) { draw_pegs(file, 10, 70); }
   fprintf(file, "<rect x=\"%d\" y=\"120\" width=\"15\" height=\"130\" "\
                 "fill=\"firebrick\" />\r\n", width);
   draw_pegs(file, pegs - 1, width + 100);
