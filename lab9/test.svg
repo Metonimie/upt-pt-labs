@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+<rect x="30" y="250" width="300" height="20" fill="firebrick" />
+<rect x="70" y="120" width="15" height="130" fill="firebrick" />
+<rect x="170" y="120" width="15" height="130" fill="firebrick" />
+<rect x="270" y="120" width="15" height="130" fill="firebrick" />
+<rect x="240" y="230" width="80" height="20" fill="#ee6517" stroke="black" stroke-width="1" />
+<rect x="250" y="209" width="60" height="20" fill="#7fffd4" stroke="black" stroke-width="1" />
+<rect x="258" y="188" width="45" height="20" fill="#bbe200" stroke="black" stroke-width="1" />
+<rect x="263" y="167" width="34" height="20" fill="#bbe200" stroke="black" stroke-width="1" />
+<rect x="267" y="146" width="26" height="20" fill="#149dca" stroke="black" stroke-width="1" />
+<rect x="270" y="125" width="20" height="20" fill="#ffc4c4" stroke="black" stroke-width="1" />
+</svg>
