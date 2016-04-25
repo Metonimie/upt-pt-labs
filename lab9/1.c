@@ -21,7 +21,7 @@ void draw_disks(FILE * file, int disks, int peg, int width, int y) {
   int x = 70 + ((peg - 1) * 100);
   fprintf(file, "<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"20\" "\
                 "fill=\"%s\" stroke=\"black\" stroke-width=\"1\" />\r\n",
-                x - width / 2 + 10, y, width, colors[random_color]);
+                x - width / 2 + 8, y, width, colors[random_color]);
   draw_disks(file, disks - 1, peg, width - width / 4, y - 21);
 }
 
