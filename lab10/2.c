@@ -16,55 +16,29 @@ void load_matrix(FILE * file) {
   }
 }
 
-int find_min_index(int arr[], size_t size) {
-  int index = -1;
-  int min = arr[0];
-  for (int j = 0; j < size; j++) {
-    if (arr[j]) {
-      min = arr[j];
-      index = j;
+void do_all_routes() {
+  FILE * file;
+  if ( !(file = fopen("routes.txt", "r")) ) { exit(0); }
+  int distance ;
+  int min_distance = 0;
+  int min_route = -1;
+  int a, b, c, d;
+  for (int i = 0; fscanf(file, "%d %d %d %d\n", &a, &b, &c, &d) == 4; i++) {
+    distance = city_distance[1][a] + city_distance[a][b] + city_distance[b][c] + city_distance[c][d];
+    if (!min_distance) {
+      min_distance = distance;
+      min_route = i;
+    } else if ( distance < min_distance) {
+      min_distance = distance;
+      min_route = i;
     }
+    printf("Route %d, [%s - %s - %s - %s - %s] Total distance: %d\n",
+    i, cities[1], cities[a], cities[b], cities[c], cities[d], distance);
   }
-  for (int i = 0; i < size; i++) {
-    if ( arr[i] != 0 && arr[i] < min ) {
-      min = arr[i];
-      index = i;
-    }
-  }
-  return index;
-}
-
-void mark_visited(int city) {
-  for (int i = 0; i < 5; i++) {
-    city_distance[i][city] = 0;
-  }
-}
-
-void find_closest_path_from(int starting_city) {
-  int distance = 0;
-  int current_city = starting_city;
-  int next_city;
-  for (int i = 0; i < 5; i++) {
-    mark_visited(current_city);
-    next_city = find_min_index(city_distance[current_city], 5);
-    if ( next_city == -1) {
-      printf("We stopped in %s\n", cities[current_city]);
-      break;
-    }
-    printf("Traveled from %s to %s.\n", cities[current_city], cities[next_city]);
-    distance += city_distance[current_city][next_city];
-
-    current_city = next_city;
-  }
-  printf("Total distance traveled: %d\n", distance);
-}
-
-void print_matrix() {
-  for (int i = 0; i < 5; i++) {
-    for (int j = 0; j < 5; j++) {
-      printf("%d ", city_distance[i][j]);
-    }
-    printf("\n");
+  printf("Minimum route: %d with the minimum distance %d\n", min_route, min_distance);
+  if ( fclose(file) ) {
+    perror("Can't close file!");
+    exit(0);
   }
 }
 
@@ -76,7 +50,7 @@ int main(void) {
   }
 
   load_matrix(file);
-  find_closest_path_from(1); // 1 - oradea;
+  do_all_routes();
 
   if ( fclose(file) ) {
     perror("File can't be closed!");
