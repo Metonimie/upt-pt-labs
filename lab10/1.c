@@ -19,7 +19,6 @@ void load_matrix(FILE * file) {
 int find_min_index(int arr[], size_t size) {
   int index = -1;
   int min = arr[0];
-  // if (!min) { min = arr[1]; index = 1; }
   for (int j = 0; j < size; j++) {
     if (arr[j]) {
       min = arr[j];
@@ -78,9 +77,6 @@ int main(void) {
 
   load_matrix(file);
   find_closest_path_from(1); // 1 - oradea;
-  // print_matrix();
-
-  // printf("%d\n", find_min_index(city_distance[1], 5));
 
   if ( fclose(file) ) {
     perror("File can't be closed!");
