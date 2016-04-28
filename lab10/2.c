@@ -5,7 +5,13 @@
 int city_distance[5][5];
 char *cities[] = {"Timisoara", "Oradea", "Cluj", "Iasi", "Bucuresti"};
 
-void load_matrix(FILE * file) {
+void load_matrix(char * filename) {
+  FILE * file;
+  if ( !(file = fopen(filename, "r")) ) {
+    fprintf(stderr, "Can't open: %s\n", filename);
+    exit(errno);
+  }
+
   int t, o, c, i, b; // timisoara, oradea ...
   for (int j = 0; fscanf(file, "%d %d %d %d %d\n", &t, &o, &c, &i, &b) == 5; j++ ) {
     city_distance[j][0] = t;
@@ -13,6 +19,11 @@ void load_matrix(FILE * file) {
     city_distance[j][2] = c;
     city_distance[j][3] = i;
     city_distance[j][4] = b;
+  }
+
+  if ( fclose(file) ) {
+    perror("File can't be closed!");
+    exit(errno);
   }
 }
 
@@ -76,19 +87,9 @@ void do_all_routes() {
 }
 
 int main(void) {
-  FILE * file;
-  if ( !(file = fopen("mat.txt", "r")) ) {
-    perror("Can't open file!");
-    return errno;
-  }
-
-  load_matrix(file);
+  load_matrix("mat.txt");
   // do_all_routes();
   do_all_routes2();
 
-  if ( fclose(file) ) {
-    perror("File can't be closed!");
-    return errno;
-  }
   return 0;
 }
