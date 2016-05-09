@@ -84,23 +84,23 @@ int find_max(list lst) {
   return max;
 }
 
- void find_peak(list * lst, size_t size) {
-   int min = find_min(lst[0]);
-   int max = find_max(lst[0]);
-   int new_min, new_max;
-   for (int i = 1; i < size; i++) {
-     new_min = find_min(lst[i]);
-     new_max = find_max(lst[i]);
-     if (new_min < min) {
-       min = new_min;
-     }
-     if (new_max > max) {
-       max = new_max;
-     }
-   }
-   printf("Maximum %d\n", max);
-   printf("Minimum %d\n", min);
+void find_peak(list * lst, size_t size) {
+  int min = find_min(lst[0]);
+  int max = find_max(lst[0]);
+  int new_min, new_max;
+  for (int i = 1; i < size; i++) {
+    new_min = find_min(lst[i]);
+    new_max = find_max(lst[i]);
+    if (new_min < min) {
+      min = new_min;
+    }
+    if (new_max > max) {
+      max = new_max;
+    }
  }
+ printf("Maximum %d\n", max);
+ printf("Minimum %d\n", min);
+}
 
 int main(void) {
   list list1 = insert(insert(insert(insert(NULL, 11), 7), 5), 3);
