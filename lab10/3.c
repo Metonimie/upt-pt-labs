@@ -103,8 +103,8 @@ void find_peak(list * lst, size_t size) {
 }
 
 int main(void) {
-  list list1 = insert(insert(insert(insert(NULL, 11), 7), 5), 3);
-  list list2 = insert(insert(insert(insert(NULL, 17), -3), 2), -8);
+  list list1 = insert(insert(insert(insert(NULL, 11), -7), 05), 03);
+  list list2 = insert(insert(insert(insert(NULL, 17), -3), 02), -8);
   list list3 = insert(insert(insert(insert(NULL, 14), 21), 10), 32);
   list lists[] = { list1, list2, list3 };
   find_peak(lists, 3);
