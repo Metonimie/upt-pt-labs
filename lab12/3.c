@@ -147,6 +147,8 @@ int main(void) {
     Dlist dli1 = NULL;
     Dlist dli2 = NULL;
 
+    // can be done without passing & by using auxiliary variable
+    // like addr as demonstrated in the frist insert function.
     split_li_to_di(li, &dli1, &dli2);
 
     print_list(li);
