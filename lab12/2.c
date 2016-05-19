@@ -43,9 +43,12 @@ Slist delete(int element, Slist list) {
     return list;
 }
 
-size_t size(Slist list) {
+size_t size(int elem, Slist list) {
     size_t elements = 0;
     while (list) {
+      if (list->el == elem) {
+          return elements;
+      }
       elements += 1;
       list = list->next;
     }
@@ -104,17 +107,14 @@ void print_dlist(Dlist list) {
 
 /* Code related to the split function */
 
-void split_li_to_di(Slist sli, Dlist * dli1, Dlist * dli2) {
+void split_li_to_di(int elem, Slist sli, Dlist * dli1, Dlist * dli2) {
     short first_insertion;
-    size_t sizzle = size(sli); // ma fizzle, drizzle
-    if (!sizzle) { return; } // exit if size is zeero.
-    size_t middle = sizzle / 2;
-
+    size_t sizzle = size(elem, sli) + 1; // ma fizzle, drizzle
 
     // Handle first double linked list.
     *dli1 = malloc(sizeof(struct _dilist));
     first_insertion = 1;
-    for (int i = 0; i < middle; i++) {
+    for (int i = 0; i < sizzle; i++) {
         if ( first_insertion) {
             *dli1 = insert_dl(sli->el, NULL);
             first_insertion = 0; // :>
@@ -125,10 +125,9 @@ void split_li_to_di(Slist sli, Dlist * dli1, Dlist * dli2) {
     }
 
     // Handle seccond double linked list.
-    if ( !(middle % 2) ) { middle += 1; } // if not even, add one.
     *dli2 = malloc(sizeof(struct _dilist));
     first_insertion = 1;
-    for (int i = 0; i < middle; i++) {
+    while (sli) {
         if ( first_insertion) {
             *dli2 = insert_dl(sli->el, NULL);
             first_insertion = 0; // :>
@@ -149,7 +148,7 @@ int main(void) {
 
     // can be done without passing & by using auxiliary variable
     // like addr as demonstrated in the frist insert function.
-    split_li_to_di(li, &dli1, &dli2);
+    split_li_to_di(2, li, &dli1, &dli2);
 
     print_list(li);
     print_dlist(dli1);
