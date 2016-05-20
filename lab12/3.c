@@ -17,18 +17,28 @@ Slist tail(Slist lst) {
     return lst->next;
 }
 
-Slist insert(int element, Slist current) {
+Slist init() {
+    Slist dummy = malloc(sizeof(struct _selist));
+    dummy->next = dummy;
+    return dummy;
+}
+
+void insert(int element, Slist current) {
     Slist head = current;
 
+    // chestia asta merge pana la ultimul element, si ramane acolo.
+    // daca-i head n-are treaba.
     while(current->next != head) {
         current = current->next;
     }
+    // creaza un nod nou, la next si schimba adresa nodului curent pe next.
     current->next = malloc(sizeof(struct _selist));
+    // se muta pe nod-ul creat
     current = current->next;
 
+    // baga elementu si face ca nodu sa pointeze spre head.
     current->el = element;
     current->next = head;
-    return current;
 }
 
 void print_list(Slist list) {
@@ -70,13 +80,13 @@ void delete_middle(Slist list) {
 }
 
 int main(void) {
-  Slist head = malloc(sizeof(struct _selist));
-  head->next = head;
+  Slist head = init();
   insert(1, head);
   insert(2, head);
   insert(3, head);
   insert(4, head);
   insert(5, head);
+  insert(6, head);
   delete_middle(head);
   print_list(head);
   return 0;
