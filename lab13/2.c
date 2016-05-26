@@ -1,10 +1,8 @@
 #include <stdio.h>
 
-long int f[1000] = {0};
-
 unsigned long int fib(unsigned long int n) {
     unsigned int i;
-
+    static long int f[1000] = {0}; // better make it static than global...
     f[0] = 0;
     f[1] = 1;
 
@@ -24,6 +22,7 @@ unsigned long int fib(unsigned long int n) {
 int main() {
     printf("%ld\n", fib(11));
     printf("%ld\n", fib(10));
+    printf("%ld\n", fib(12));
     printf("%ld\n", fib(12));
     return 0;
 }
