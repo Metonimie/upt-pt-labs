@@ -5,7 +5,7 @@ enum cardsuit {
   DIAMONDS = 2 ,
   HEARTS = 3 ,
   SPADES = 4
-} custom_deck [ 52 ] ;
+} custom_deck [ 52 ];
 
 struct {
   unsigned int age : 3;
