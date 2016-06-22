@@ -60,10 +60,9 @@ void _insert_first(List list, double data) {
     // head | wwwti
     //  ^
     List node = malloc(sizeof(struct _dl_list));
-    List head = list;
     node->data = data;
-    node->next = head;
-    node->prev = head;
+    node->next = list;
+    node->prev = list;
     list->next = node;
     list->prev = node;
 }
@@ -183,7 +182,6 @@ void sort_file(const char * filename) {
 }
 
 int main() {
-
     generate_file("numbers.txt");
     List boss = init();
     read_from_file(boss, "numbers.txt");
