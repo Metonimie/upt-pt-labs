@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
-
 // Sa se genereze un fisier binar cu 100 de numere reale(float/double) arbitrar.
 void generate_file(const char * filename) {
     srand(time(NULL));
@@ -43,44 +41,63 @@ List init() {
     return new_list;
 }
 
+void _insert_middle(List list, double data) {
+    //  head ... prev node | wwwti | cur node | next node ... last node
+    //                                   ^
+    // wwwti = where we want to insert.
+    List cur_node = list;
+    List node = malloc(sizeof(struct _dl_list));
+    node->data = data;
+    node->next = cur_node;
+    node->prev = cur_node->prev;
+
+    cur_node->prev->next = node;
+    cur_node->next->prev = cur_node;
+    cur_node->prev = node;
+}
+
+void _insert_first(List list, double data) {
+    // head | wwwti
+    //  ^
+    List node = malloc(sizeof(struct _dl_list));
+    List head = list;
+    node->data = data;
+    node->next = head;
+    node->prev = head;
+    list->next = node;
+    list->prev = node;
+}
+
+void _insert_last(List list, List head, double data) {
+    // cur_node | wwwti | head
+    //    ^
+    List node = malloc(sizeof(struct _dl_list));
+    node->data = data;
+    node->next = head;
+    node->prev = list;
+    list->next = node;
+}
+
+/* The statement _insert_middle(...) can be replaced by the actual
+ * code from the function _insert_middle. I've chosed to move the
+ * code in a different function in order to keep this one small.
+ * Same goes for the other two: _insert_first and _insert_last
+ */
 void add(List list, double data) {
     List head = list;
     int flag = 0;
     while( list->next != head ) { // middle insertion
         list = list->next;
         if ( data < list->data && !flag) {
-            List cur_node = list;
-            List node = malloc(sizeof(struct _dl_list));
-            node->data = data;
-            node->next = cur_node;
-            node->prev = cur_node->prev;
-
-            cur_node->prev->next = node;
-            cur_node->next->prev = cur_node;
-            cur_node->prev = node;
-            //  head ... prev node | wwwti | cur node | next node ... last node
-            //                                   ^
-            // wwwti = where we want to insert.
+            _insert_middle(list, data);
             flag = 1;
         }
     }
     if ( list == head ) { // first insertion
-        List node = malloc(sizeof(struct _dl_list));
-        node->data = data;
-        node->next = head;
-        node->prev = head;
-        list->next = node;
-        list->prev = node;
+        _insert_first(list, data);
         list = list->next;
     } if ( list->next == head && data > list->data) { // last insertion
-        // cur_node | wwwti | head
-        //    ^
-        List node = malloc(sizeof(struct _dl_list));
-        node->data = data;
-        node->next = head;
-        node->prev = list;
-
-        list->next = node;
+        _insert_last(list, head, data);
         list = list->next; // move to wwwti
     }
 
