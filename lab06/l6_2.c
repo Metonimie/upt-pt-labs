@@ -89,7 +89,7 @@ void area_rectangle(struct gshape *gs) {
   double length = gs->gshape.rectangle.x4 - gs->gshape.rectangle.x1;
   double width = gs->gshape.rectangle.y4 - gs->gshape.rectangle.x4;
   printf("AREA OF RECTANGLE #%d IS: %g\n", gs->ID, fabs(length*width) );
-}
+}                   
 
 int main() {
   int i, type;
