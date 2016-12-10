@@ -211,17 +211,6 @@ unsigned solve_mat(unsigned c, unsigned r) {
 	return 0;
 }
 
-void skip_lines(FILE * fd, unsigned num) {
-	for (unsigned i = 0; i < num; ++i) {
-		fscanf(fd, "%*[^\n]\n", NULL);
-	}
-}
-
-void fatal(const char * msg) {
-	fprintf(stderr, "%s\n", msg);
-	exit(1);
-}
-
 int main(void) {
 
 	make_exit_cell(&testM[3][3]);
