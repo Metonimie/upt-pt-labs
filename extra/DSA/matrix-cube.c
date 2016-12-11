@@ -31,17 +31,7 @@ int cols;
 // Config settings.
 config_t configuration;
 config_setting_t * cfg_setting;
-
-// unsigned testM[4][4] = {
-// 	{0, 0, 0, 0},
-// 	{0, 0, 0, 0},
-// 	{0, 0, 0, 0},
-// 	{0, 0, 0, 0},
-// };
-
 unsigned ** testM;
-// The number will represent the death time, when it reaches 0, the cell
-// becomes a death wall.
 
 void make_visited_cell(unsigned * x) { *x |= VISITED_MASK; }
 void unmake_visited_cell(unsigned * x) { *x &= ~VISITED_MASK; }
