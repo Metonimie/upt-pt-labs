@@ -23,19 +23,23 @@
 #define ISWALL(x)    ((x) & WALL_MASK)
 #define GETNUMBER(x) ((x) & NUMBER_MASK)
 
-unsigned rows = 4;
-unsigned cols = 4;
+void fatal(const char * msg);
+
+int rows;
+int cols;
 
 // Config settings.
 config_t configuration;
+config_setting_t * cfg_setting;
 
-unsigned testM[4][4] = {
-	{0, 0, 0, 0},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0},
-};
+// unsigned testM[4][4] = {
+// 	{0, 0, 0, 0},
+// 	{0, 0, 0, 0},
+// 	{0, 0, 0, 0},
+// 	{0, 0, 0, 0},
+// };
 
+unsigned ** testM;
 // The number will represent the death time, when it reaches 0, the cell
 // becomes a death wall.
 
@@ -137,9 +141,9 @@ void set_timmer(unsigned row, unsigned col, unsigned timer) {
 	}
 }
 
-void print_matrix2(unsigned m[4][4], unsigned row, unsigned col) {
-	for (unsigned i = 0; i < row; ++i) {
-		for (unsigned j = 0; j < col; ++j) {
+void print_matrix(unsigned ** testM) {
+	for (unsigned i = 0; i < rows; ++i) {
+		for (unsigned j = 0; j < cols; ++j) {
 			printf(" ");
 			if ( ISEXIT(testM[i][j])) {
 				printf("E  ");
@@ -167,6 +171,9 @@ void print_matrix2(unsigned m[4][4], unsigned row, unsigned col) {
 
 unsigned ** new_matrix(unsigned row, unsigned col) {
 	unsigned ** mat = (unsigned **) calloc(row, sizeof(unsigned *));
+	if (mat == NULL) {
+		fatal("Not enough memory to allocate the matrix.");
+	}
 	for (unsigned i = 0; i < col; ++i) {
 		mat[i] = (unsigned *) calloc(col, sizeof(unsigned) * col);
 	}
@@ -217,27 +224,17 @@ unsigned solve_mat(unsigned c, unsigned r) {
 	return 0;
 }
 
-/* Simple test code */
-
-// make_exit_cell(&testM[3][3]);
-// make_wall_cell(&testM[0][3]);
-// make_wall_cell(&testM[1][1]);
-// make_wall_cell(&testM[2][1]);
-// make_wall_cell(&testM[2][2]);
-// make_wall_cell(&testM[2][3]);
-//
-// for (unsigned i = 0; i < rows; ++i) {
-// 	for (unsigned j = 0; j < cols; ++j) {
-// 		set_timmer(i, j, 6);
-// 	}
-// }
-//
-// print_matrix2(testM, 4, 4);
-// unsigned x = solve_mat(0, 0);
-// printf("Solved: %d\n", x);
-// print_matrix2(testM, 4, 4);
+void fatal(const char * msg) {
+	fputs(msg, stderr);
+	fprintf(stderr, "\n");
+	exit(1);
+}
 
 int main(void) {
+	/* Variables */
+	int start_row = 0, start_col = 0;
+	int end_row   = 0, end_col   = 0;
+
 	/* Initialize the configuration structure */
 	config_init(&configuration);
 
@@ -248,5 +245,97 @@ int main(void) {
 		return EXIT_FAILURE;
 	}
 
+	/* Get the matrix settings. */
+	cfg_setting = config_lookup(&configuration, "application.matrix");
+	if ( cfg_setting != NULL ) {
+		/* Matrix rows */
+		if ( config_setting_lookup_int(cfg_setting, "rows", &rows)
+		!= CONFIG_TRUE ) {
+			fatal("Error finding the length of the rows.");
+		}
+		/* Matrix cols */
+		if ( config_setting_lookup_int(cfg_setting, "columns", &cols)
+		!= CONFIG_TRUE ) {
+			fatal("Error finding the length of the cols.");
+		}
+		/* Engineer start row */
+		if ( config_setting_lookup_int(cfg_setting, "start_row", &start_row)
+			!= CONFIG_TRUE ) {
+			fatal("Error finding the start row.");
+		}
+		/* Engineer start col */
+		if ( config_setting_lookup_int(cfg_setting, "start_col", &start_col)
+		!= CONFIG_TRUE ) {
+			fatal("Error finding the start col.");
+		}
+		/* Exit row */
+		if ( config_setting_lookup_int(cfg_setting, "end_row", &end_row)
+		!= CONFIG_TRUE ) {
+			fatal("Error finding the exit row.");
+		}
+		/* Exit col */
+		if ( config_setting_lookup_int(cfg_setting, "end_col", &end_col)
+		!= CONFIG_TRUE ) {
+			fatal("Error finding the exit col.");
+		}
+
+		/* Create the matrix and the exit */
+		testM = new_matrix(rows, cols);
+		make_exit_cell(&testM[end_row][end_col]);
+	} else {
+		fatal("Matrix settings not found!");
+	}
+
+	/* Get the wall settings. */
+	cfg_setting = config_lookup(&configuration, "application.walls");
+	if ( cfg_setting != NULL ) {
+		int wall_count = config_setting_length(cfg_setting);
+
+		for (int i = 0; i < wall_count; ++i) {
+			config_setting_t * wall_setting = config_setting_get_elem(cfg_setting, i);
+			int wall_row = 0;
+			int wall_col = 0;
+
+			if (!config_setting_lookup_int(wall_setting, "row", &wall_row)) {
+				fatal("Invalid row found in wall settings.");
+			}
+			if (!config_setting_lookup_int(wall_setting, "column", &wall_col)) {
+				fatal("Invalid row found in wall settings.");
+			}
+
+			make_wall_cell(&testM[wall_row][wall_col]);
+		}
+	} else {
+		fatal("Wall settings not found!");
+	}
+
+	cfg_setting = config_lookup(&configuration, "application.timers");
+	if ( cfg_setting != NULL ) {
+		int timer_count = config_setting_length(cfg_setting);
+		int timer_idx = 0;
+		if ( timer_count != rows * cols) {
+			fatal("Invalid number of timers provided!");
+		}
+
+		int val = 0;
+		for (unsigned i = 0; i < rows; ++i) {
+			for (unsigned j = 0; j < cols; ++j) {
+				val = config_setting_get_int_elem(cfg_setting, timer_idx);
+				set_timmer(i, j, val);
+				++timer_idx;
+			}
+		}
+	} else {
+		fatal("Timer settings not found!");
+	}
+
+	print_matrix(testM);
+	int solution_found = solve_mat(start_col, start_row);
+	printf("Matrix solved? %s\n", solution_found ? "yes" : "no");
+	if (solution_found) {
+		print_matrix(testM);
+	}
+
+	config_destroy(&configuration);
 	return EXIT_SUCCESS;
 }
