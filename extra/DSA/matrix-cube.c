@@ -158,6 +158,7 @@ void print_matrix(unsigned ** testM) {
 	}
 }
 
+// This function will create a new matrix.
 unsigned ** new_matrix(unsigned row, unsigned col) {
 	unsigned ** mat = (unsigned **) calloc(row, sizeof(unsigned *));
 	if (mat == NULL) {
@@ -167,6 +168,14 @@ unsigned ** new_matrix(unsigned row, unsigned col) {
 		mat[i] = (unsigned *) calloc(col, sizeof(unsigned) * col);
 	}
 	return mat;
+}
+
+// This function will destroy the matrix.
+void destroy_matrix(unsigned ** matrix) {
+	for (int i = 0; i < rows; ++i) {
+		free(testM[i]);
+	}
+	free(testM);
 }
 
 // This function will be called with the initial position from where the player
@@ -328,6 +337,7 @@ int main(void) {
 		print_matrix(testM);
 	}
 
+	destroy_matrix(testM);
 	config_destroy(&configuration);
 	return EXIT_SUCCESS;
 }
