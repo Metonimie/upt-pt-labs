@@ -3,10 +3,13 @@
 	Date: 10.12.2016
 	https://www.ryoko-rpg.ro
 	https://github.com/Metonimie
+	Dependencies:
+		- libconfig
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <libconfig.h>
 
 #define VISITED_MASK   ( (unsigned) 1 << 4)
 #define DEATH_MASK     ( (unsigned) 1 << 5)
@@ -22,6 +25,9 @@
 
 unsigned rows = 4;
 unsigned cols = 4;
+
+// Config settings.
+config_t configuration;
 
 unsigned testM[4][4] = {
 	{0, 0, 0, 0},
@@ -211,25 +217,36 @@ unsigned solve_mat(unsigned c, unsigned r) {
 	return 0;
 }
 
+/* Simple test code */
+
+// make_exit_cell(&testM[3][3]);
+// make_wall_cell(&testM[0][3]);
+// make_wall_cell(&testM[1][1]);
+// make_wall_cell(&testM[2][1]);
+// make_wall_cell(&testM[2][2]);
+// make_wall_cell(&testM[2][3]);
+//
+// for (unsigned i = 0; i < rows; ++i) {
+// 	for (unsigned j = 0; j < cols; ++j) {
+// 		set_timmer(i, j, 6);
+// 	}
+// }
+//
+// print_matrix2(testM, 4, 4);
+// unsigned x = solve_mat(0, 0);
+// printf("Solved: %d\n", x);
+// print_matrix2(testM, 4, 4);
+
 int main(void) {
+	/* Initialize the configuration structure */
+	config_init(&configuration);
 
-	make_exit_cell(&testM[3][3]);
-	make_wall_cell(&testM[0][3]);
-	make_wall_cell(&testM[1][1]);
-	make_wall_cell(&testM[2][1]);
-	make_wall_cell(&testM[2][2]);
-	make_wall_cell(&testM[2][3]);
-
-	for (unsigned i = 0; i < rows; ++i) {
-		for (unsigned j = 0; j < cols; ++j) {
-			set_timmer(i, j, 6);
-		}
+	if ( config_read_file(&configuration, "data.cfg") != CONFIG_TRUE ) {
+		fprintf(stderr, "Configuration Error: %s\n", config_error_text(&configuration));
+		fprintf(stderr, "File: %s on line %d\n", config_error_file(&configuration),
+ 			config_error_line(&configuration));
+		return EXIT_FAILURE;
 	}
-
-	print_matrix2(testM, 4, 4);
-	unsigned x = solve_mat(0, 0);
-	printf("Solved: %d\n", x);
-	print_matrix2(testM, 4, 4);
 
 	return EXIT_SUCCESS;
 }
