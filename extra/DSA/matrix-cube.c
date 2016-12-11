@@ -28,7 +28,6 @@ void fatal(const char * msg);
 int rows;
 int cols;
 
-// Config settings.
 config_t configuration;
 config_setting_t * cfg_setting;
 unsigned ** testM;
@@ -281,6 +280,7 @@ int main(void) {
 	if ( cfg_setting != NULL ) {
 		int wall_count = config_setting_length(cfg_setting);
 
+		/* For each wall */
 		for (int i = 0; i < wall_count; ++i) {
 			config_setting_t * wall_setting = config_setting_get_elem(cfg_setting, i);
 			int wall_row = 0;
@@ -308,6 +308,7 @@ int main(void) {
 		}
 
 		int val = 0;
+		/* For each timer */
 		for (unsigned i = 0; i < rows; ++i) {
 			for (unsigned j = 0; j < cols; ++j) {
 				val = config_setting_get_int_elem(cfg_setting, timer_idx);
@@ -319,6 +320,7 @@ int main(void) {
 		fatal("Timer settings not found!");
 	}
 
+	/* Solve the matrix */
 	print_matrix(testM);
 	int solution_found = solve_mat(start_col, start_row);
 	printf("Matrix solved? %s\n", solution_found ? "yes" : "no");
