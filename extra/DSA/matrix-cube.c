@@ -1,8 +1,6 @@
 /*
 	Created by Fry.
 	Date: 10.12.2016
-	https://www.ryoko-rpg.ro
-	https://github.com/Metonimie
 	Dependencies:
 		- libconfig
  */
