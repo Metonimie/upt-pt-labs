@@ -118,7 +118,13 @@ void modify_party(Party party, const char * name, const char * symbol) {
 
 void move_candidate(Party head, Party new_party, const char * name) {
   Party current_party = search_candidate(head, name);
+  if (current_party == NULL) {
+    return;
+  }
   Member candidate = get_canditate(current_party, name);
+  if ( candidate == NULL ) {
+    return;
+  }
   Member copy = new_candidate(candidate->name, candidate->age,
                               candidate->convicted);
   delete_candidate(current_party, name);
@@ -224,9 +230,9 @@ int main(void) {
   // delete_candidate(head, "bran");
   // delete_candidate(head, "Tyrion");
   // delete_candidate_list(head);
-  move_candidate(head, targaryan, "Ed");
+  // move_candidate(head, targaryan, "Ed");
+  // move_candidate(head, targaryan, "nume");
 
-  print_all(head);
   print_all(head);
   return EXIT_SUCCESS;
 }
